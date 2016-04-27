@@ -2,6 +2,8 @@
 [![Build Status](https://travis-ci.org/CloudCom/goose.svg?branch=master)](https://travis-ci.org/CloudCom/goose)
 [![Coverage Status](https://coveralls.io/repos/CloudCom/goose/badge.svg?branch=master&service=github)](https://coveralls.io/github/CloudCom/goose?branch=master)
 
+NOTE: This is a fork from goose repository where I have removed SQLite support as it was interefering with cross platform compilation using [gox](https://github.com/mitchellh/gox). I have fixed every test except 1, but there is no guarantee of absence of unexpected behavior or bugs, please use this at your own risk.
+
 # goose
 
 goose is a database migration tool.

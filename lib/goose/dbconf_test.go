@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -101,11 +100,9 @@ func TestNewDBConf_default(t *testing.T) {
 	defer os.Setenv("DB_MIGRATIONS_DIR", os.Getenv("DB_MIGRATIONS_DIR"))
 	os.Setenv("DB_MIGRATIONS_DIR", "/migdir")
 	defer os.Setenv("DB_DRIVER", os.Getenv("DB_DRIVER"))
-	os.Setenv("DB_DRIVER", "mysqlite3")
+	os.Setenv("DB_DRIVER", "mysql")
 	defer os.Setenv("DB_DRIVER_IMPORT", os.Getenv("DB_DRIVER_IMPORT"))
-	os.Setenv("DB_DRIVER_IMPORT", "github.com/myfork/sqlite3")
 	defer os.Setenv("DB_DIALECT", os.Getenv("DB_DIALECT"))
-	os.Setenv("DB_DIALECT", "sqlite3")
 	defer os.Setenv("DB_DSN", os.Getenv("DB_DSN"))
 	os.Setenv("DB_DSN", "foo")
 
@@ -113,9 +110,7 @@ func TestNewDBConf_default(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "/migdir", dbconf.MigrationsDir)
-	assert.Equal(t, "mysqlite3", dbconf.Driver.Name)
-	assert.Equal(t, "github.com/myfork/sqlite3", dbconf.Driver.Import)
-	assert.Equal(t, &Sqlite3Dialect{}, dbconf.Driver.Dialect)
+	assert.Equal(t, "mysql", dbconf.Driver.Name)
 	assert.Equal(t, "foo", dbconf.Driver.OpenStr)
 }
 
@@ -179,14 +174,6 @@ func TestNewDBConf_driverDefaults(t *testing.T) {
 				Dialect: &MySqlDialect{},
 			},
 		},
-		{
-			[]string{"sqlite3"},
-			DBDriver{
-				Name:    "sqlite3",
-				Import:  "github.com/mattn/go-sqlite3",
-				Dialect: &Sqlite3Dialect{},
-			},
-		},
 	}
 	for _, test := range tests {
 		for _, driverName := range test.names {
@@ -220,36 +207,5 @@ func TestImportOverride(t *testing.T) {
 	want := "github.com/custom/driver"
 	if got != want {
 		t.Errorf("bad custom import. got %v want %v", got, want)
-	}
-}
-
-func TestDriverSetFromEnvironmentVariable(t *testing.T) {
-	databaseUrlEnvVariableKey := "DB_DRIVER"
-	databaseUrlEnvVariableVal := "sqlite3"
-	databaseOpenStringKey := "DATABASE_URL"
-	databaseOpenStringVal := "db.db"
-
-	os.Setenv(databaseUrlEnvVariableKey, databaseUrlEnvVariableVal)
-	os.Setenv(databaseOpenStringKey, databaseOpenStringVal)
-
-	dbconf, err := NewDBConf("../../_example", "environment_variable_config")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	got := reflect.TypeOf(dbconf.Driver.Dialect)
-	want := reflect.TypeOf(&Sqlite3Dialect{})
-
-	if got != want {
-		t.Errorf("Not able to read the driver type from environment variable."+
-			"got %v want %v", got, want)
-	}
-
-	gotOpenString := dbconf.Driver.OpenStr
-	wantOpenString := databaseOpenStringVal
-
-	if gotOpenString != wantOpenString {
-		t.Errorf("Not able to read the open string from the environment."+
-			"got %v want %v", gotOpenString, wantOpenString)
 	}
 }

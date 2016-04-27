@@ -1,9 +1,6 @@
 package goose
 
-import (
-	"database/sql"
-	"strings"
-)
+import "database/sql"
 
 // SqlDialect abstracts the details of specific SQL dialects
 // for goose's few SQL specific statements
@@ -22,8 +19,6 @@ func dialectByName(d string) SqlDialect {
 		return &RedshiftDialect{}
 	case "mysql":
 		return &MySqlDialect{}
-	case "sqlite3":
-		return &Sqlite3Dialect{}
 	}
 
 	return nil
@@ -123,33 +118,5 @@ func (m MySqlDialect) dbVersionQuery(db *sql.DB) (*sql.Rows, error) {
 		return nil, ErrTableDoesNotExist
 	}
 
-	return rows, err
-}
-
-////////////////////////////
-// sqlite3
-////////////////////////////
-
-type Sqlite3Dialect struct{}
-
-func (m Sqlite3Dialect) createVersionTableSql() string {
-	return `CREATE TABLE goose_db_version (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                version_id INTEGER NOT NULL,
-                is_applied INTEGER NOT NULL,
-                tstamp TIMESTAMP DEFAULT (datetime('now'))
-            );`
-}
-
-func (m Sqlite3Dialect) insertVersionSql() string {
-	return "INSERT INTO goose_db_version (version_id, is_applied) VALUES (?, ?);"
-}
-
-func (m Sqlite3Dialect) dbVersionQuery(db *sql.DB) (*sql.Rows, error) {
-	rows, err := db.Query("SELECT version_id, is_applied, tstamp from goose_db_version ORDER BY id DESC")
-
-	if err != nil && strings.Contains(err.Error(), "no such table") {
-		err = ErrTableDoesNotExist
-	}
 	return rows, err
 }

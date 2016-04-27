@@ -8,19 +8,10 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func getSqlite3Driver(t *testing.T) DBDriver {
-	return DBDriver{
-		Name:    "sqlite3",
-		Dialect: Sqlite3Dialect{},
-		OpenStr: ":memory:",
-	}
-}
 
 func getMysqlDriver(t *testing.T) DBDriver {
 	dsn := os.Getenv("MYSQL_DATABASE_DSN")
@@ -194,9 +185,7 @@ func testRunMigrationsOnDb(t *testing.T, driver DBDriver) {
 	assert.Contains(t, values, "one")
 	assert.Contains(t, values, "two")
 }
-func TestRunMigrationsOnDb_sqlite3(t *testing.T) {
-	testRunMigrationsOnDb(t, getSqlite3Driver(t))
-}
+
 func TestRunMigrationsOnDb_mysql(t *testing.T) {
 	testRunMigrationsOnDb(t, getMysqlDriver(t))
 }
@@ -268,9 +257,7 @@ func testRunMigrationsOnDb_missingMiddle(t *testing.T, driver DBDriver) {
 	assert.Contains(t, values, "one")
 	assert.Contains(t, values, "two")
 }
-func TestRunMigrationsOnDb_missingMiddle_sqlite3(t *testing.T) {
-	testRunMigrationsOnDb_missingMiddle(t, getSqlite3Driver(t))
-}
+
 func TestRunMigrationsOnDb_missingMiddle_mysql(t *testing.T) {
 	testRunMigrationsOnDb_missingMiddle(t, getMysqlDriver(t))
 }
@@ -321,9 +308,7 @@ func testRunMigrationsOnDb_down(t *testing.T, driver DBDriver) {
 	assert.Len(t, values, 1)
 	assert.Contains(t, values, "one")
 }
-func TestRunMigrationsOnDb_down_sqlite3(t *testing.T) {
-	testRunMigrationsOnDb_down(t, getSqlite3Driver(t))
-}
+
 func TestRunMigrationsOnDb_down_mysql(t *testing.T) {
 	testRunMigrationsOnDb_down(t, getMysqlDriver(t))
 }
@@ -382,9 +367,7 @@ func testRunMigrationsOnDb_upDownUp(t *testing.T, driver DBDriver) {
 	assert.Contains(t, values, "one")
 	assert.Contains(t, values, "two")
 }
-func TestRunMigrationsOnDb_upDownUp_sqlite3(t *testing.T) {
-	testRunMigrationsOnDb_upDownUp(t, getSqlite3Driver(t))
-}
+
 func TestRunMigrationsOnDb_upDownUp_mysql(t *testing.T) {
 	testRunMigrationsOnDb_upDownUp(t, getMysqlDriver(t))
 }

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/CloudCom/goose/lib/goose"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/thezelus/goose/lib/goose"
 )
 
 func TestIntegrationCreate_sql(t *testing.T) {
